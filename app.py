@@ -3,6 +3,14 @@ from decimal import Decimal
 import re
 
 def clean_input_string(input_string):
+    parts = input_string.split('.')
+    for part in parts:
+        partss = part.split(' ')
+        for i in range(1, len(partss)):
+            if len(partss[i]) != 3:
+                result_label.config(text="Неправильный формат вводимого числа")
+                return
+
     cleaned_string = input_string.strip().replace(' ', '').replace(',', '.')
     if re.match(r'^[+-]?\d+(\.\d+)?$', cleaned_string):
         return cleaned_string
@@ -11,7 +19,7 @@ def clean_input_string(input_string):
 result = None
 
 def format_result(result):
-    formatted_result = f"{result:.6f}".rstrip('0').rstrip('.')
+    formatted_result = f"{result:,.6f}".rstrip('0').rstrip('.').format().replace(',', ' ')
     return formatted_result
 
 def calculate():
@@ -58,11 +66,11 @@ def copy_result():
         app.update()
         result_label.config(text="Результат скопирован в буфер обмена")
 
-def paste_from_clipboard():
-    clipboard_data = app.clipboard_get()
-    if clipboard_data:
-        entry_num1.delete(0, tk.END)
-        entry_num1.insert(0, clipboard_data)
+# def paste_from_clipboard():
+#     clipboard_data = app.clipboard_get()
+#     if clipboard_data:
+#         entry_num1.delete(0, tk.END)
+#         entry_num1.insert(0, clipboard_data)
 
 def copy_selected():
     # Get the currently selected text
@@ -71,15 +79,19 @@ def copy_selected():
     if selected_text:
         app.clipboard_clear()
         app.clipboard_append(selected_text)
+        app.update()
 
 def paste_selected(event=None):
     widget = app.focus_get()
     if isinstance(widget, tk.Entry):
         # Get the currently selected text from the clipboard
         selected_text = app.clipboard_get()
+        selected_text = selected_text[:len(selected_text)/2]
         # Paste the selected text into the currently focused input field
         if selected_text:
             widget.insert(tk.INSERT, selected_text)
+        app.update()
+
 
 
 app = tk.Tk()
